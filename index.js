@@ -29,8 +29,13 @@ async function run() {
 
     const toysCollection = client.db('toysDB').collection('toys')
     
-    app.get('/toys',async(req,res)=>{
-        const result = await toysCollection.find().toArray()
+    app.get('/toys/:text',async(req,res)=>{
+        if(req.params.text === 'Sports' || req.params.text === 'Off-Road' || req.params.text === 'Emergency'){
+            const result = await toysCollection.find({
+                subCategory: req.params.text}).toArray()
+                return res.send(result)
+        }
+        const result = await toysCollection.find({}).toArray()
         res.send(result)
     })
   
