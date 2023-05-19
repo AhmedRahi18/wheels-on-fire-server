@@ -28,15 +28,26 @@ async function run() {
     await client.connect();
 
     const toysCollection = client.db('toysDB').collection('toys')
+
+    app.get('/toys',async(req,res)=>{
+      const result = await toysCollection.find().limit(20).toArray()
+      res.send(result)
+    })
     
     app.get('/toys/:text',async(req,res)=>{
         if(req.params.text === 'Sports' || req.params.text === 'Off-Road' || req.params.text === 'Emergency'){
             const result = await toysCollection.find({
-                subCategory: req.params.text}).toArray()
+                subCategory: req.params.text}).limit(20).toArray()
                 return res.send(result)
         }
-        const result = await toysCollection.find({}).toArray()
+        const result = await toysCollection.find({}).limit(20).toArray()
         res.send(result)
+    })
+
+    app.post('/toys',async(req,res)=>{
+      const added = req.body;
+      const result = await toysCollection.insertOne(added)
+      res.send(result)
     })
   
 
