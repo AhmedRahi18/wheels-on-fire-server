@@ -68,6 +68,21 @@ async function run() {
       const result = await toysCollection.findOne(query)
       res.send(result)
     })
+
+    app.patch('/update/:id',async(req,res)=>{
+      const id = req.params.id;
+      const filter = { _id: new ObjectId(id)}
+      const updateToy = req.body;
+      const updateDoc = {
+        $set: {
+          price: updateToy.price,
+          quantity: updateToy.quantity,
+          description: updateToy.description
+        }
+      }
+      const result = await toysCollection.updateOne(filter,updateDoc);
+      res.send(result)
+    })
   
 
     // Send a ping to confirm a successful connection
