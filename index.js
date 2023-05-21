@@ -51,7 +51,12 @@ async function run() {
     })
 
     app.get('/mytoys/:email',async(req,res)=>{
-      const result = await toysCollection.find({sellerEmail:req.params.email}).toArray()
+      const sortBy = req.query.sortBy; 
+      let sortOrder = 1;
+      if (sortBy === 'desc') {
+        sortOrder = -1; 
+      }
+      const result = await toysCollection.find({sellerEmail:req.params.email}).sort({ price: sortOrder }).toArray()
       res.send(result)
     })
 
@@ -83,7 +88,21 @@ async function run() {
       const result = await toysCollection.updateOne(filter,updateDoc);
       res.send(result)
     })
-  
+
+      const indexKeys = {name:1};
+      const indexOptions = {name: "toyName"};
+
+      const result = await toysCollection.createIndex(indexKeys,indexOptions)
+      
+      app.get('/toysearch/:text',async(req,res) => {
+        const searchToy = req.params.text;
+
+        const result = await toysCollection.find({
+          name: {$regex: searchToy,$options: 'i'}
+        }).toArray()
+        res.send(result)
+      })
+
 
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
